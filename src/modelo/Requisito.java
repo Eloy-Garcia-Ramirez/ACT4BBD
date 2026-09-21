@@ -20,4 +20,5 @@ public class Requisito {
 
     // Método Getter
     public boolean getFueEntregado() { return fueEntregado; }
+    public String getNombreDocumento() { return nombreDocumento; }
 }
