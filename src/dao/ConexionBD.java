@@ -16,18 +16,13 @@ public class ConexionBD {
     // Método que funciona como puente de comunicación
     public static Connection conectar() {
         Connection conexion = null;
-
-
         try {
             conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-            System.out.println("\n🟢 ¡Conexión exitosa a la Base de Datos!");
+            System.out.println("\n>> ¡Conexión exitosa a la Base de Datos!");
         } catch (SQLException e) {
-            System.out.println("\n🔴 Error: No se pudo conectar a la Base de Datos. Verifique que el contenedor este encendido.");
-            System.out.println("\nDetalle técnico: " + e.getMessage());
+            System.out.println("\n>> Error: No se pudo conectar a la Base de Datos. Verifique que el contenedor esté encendido.");
+            System.out.println("\n>> Detalle técnico: " + e.getMessage());
         }
-
-
         return conexion;
     }
 }
-

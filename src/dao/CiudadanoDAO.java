@@ -1,14 +1,12 @@
 package dao;
 
 
+import modelo.Ciudadano;
+import modelo.SolicitudLicencia;
+import modelo.Requisito;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-
-import modelo.Ciudadano;
-import modelo.Requisito;
-import modelo.SolicitudLicencia;
 
 
 public class CiudadanoDAO {
@@ -24,8 +22,6 @@ public class CiudadanoDAO {
 
         try {
             Connection conexion = ConexionBD.conectar();
-
-
             if (conexion != null) {
                 // Guardar Ciudadano y obtener su ID
                 PreparedStatement pstmtCiudadano = conexion.prepareStatement(sqlCiudadano, java.sql.Statement.RETURN_GENERATED_KEYS);
@@ -45,7 +41,7 @@ public class CiudadanoDAO {
 
                 // Guardar Solicitud y obtener su ID
                 PreparedStatement pstmtSolicitud = conexion.prepareStatement(sqlSolicitud, java.sql.Statement.RETURN_GENERATED_KEYS);
-                pstmtSolicitud.setInt(1, idCiudadanoGenerado); // FK
+                pstmtSolicitud.setInt(1, idCiudadanoGenerado); // Relacionamos con la tabla Ciudadano (FK)
                 pstmtSolicitud.setString(2, solicitud.getTipoLicencia());
                 pstmtSolicitud.setBoolean(3, solicitud.getEstaAprobada());
                 pstmtSolicitud.executeUpdate();
@@ -61,22 +57,22 @@ public class CiudadanoDAO {
 
                 // Guardar Requisito utilizando el folio de la Solicitud
                 PreparedStatement pstmtRequisito = conexion.prepareStatement(sqlRequisito);
-                pstmtRequisito.setInt(1, folioGenerado); // Fk
+                pstmtRequisito.setInt(1, folioGenerado); // Relacionamos con la tabla SolicitudLicencia (FK)
                 pstmtRequisito.setString(2, requisito.getNombreDocumento());
                 pstmtRequisito.setBoolean(3, requisito.getFueEntregado());
                 pstmtRequisito.executeUpdate();
 
 
-                System.out.println("\n🟢 ¡Éxito! Trámite guardado correctamente.");
+                System.out.println("\n>> ¡Éxito! Trámite guardado en la base de datos.");
 
 
                 pstmtCiudadano.close();
-                pstmtRequisito.close();
                 pstmtSolicitud.close();
+                pstmtRequisito.close();
                 conexion.close();
             }
         } catch (SQLException e) {
-            System.out.println("🔴 Error al guardar en la Base de Datos: " + e.getMessage());
+            System.out.println("\n>> Error al guardar en la base de datos: " + e.getMessage());
         }
     }
 
@@ -86,15 +82,13 @@ public class CiudadanoDAO {
         String sql = "SELECT c.id_ciudadano, c.nombre, c.curp, c.telefono, " +
                      "s.folio, s.tipo_licencia, s.esta_aprobada, " +
                      "r.nombre_documento, r.fue_entregado " +
-                     "FROM Ciudadano c" +
+                     "FROM Ciudadano c " +
                      "INNER JOIN SolicitudLicencia s ON c.id_ciudadano = s.id_ciudadano " +
                      "INNER JOIN Requisito r ON s.folio = r.folio_solicitud";
 
 
         try {
             Connection conexion = ConexionBD.conectar();
-
-
             if (conexion != null) {
                 java.sql.Statement stmt = conexion.createStatement();
                 java.sql.ResultSet rs = stmt.executeQuery(sql);
@@ -104,11 +98,9 @@ public class CiudadanoDAO {
                 System.out.println("=".repeat(50));
                 System.out.println("    HISTORIAL DE TRÁMITES");
                 System.out.println("=".repeat(50));
-
-
+               
                 int contador = 0;
-
-
+               
                 while (rs.next()) {
                     contador++;
                     System.out.println("\nRegistro #" + rs.getInt("id_ciudadano") + ":");
@@ -122,12 +114,18 @@ public class CiudadanoDAO {
                     System.out.println("Requisito (" + rs.getString("nombre_documento") + ") entregado: " + (rs.getBoolean("fue_entregado") ? "Sí" : "No"));
                     System.out.println("Aprobado: " + (rs.getBoolean("esta_aprobada") ? "Sí" : "No"));
                 }
-
-
                
+                if(contador == 0) {
+                     System.out.println("\n>> Aún no hay ningún trámite registrado en la base de datos.");
+                }
+
+
+                rs.close();
+                stmt.close();
+                conexion.close();
             }
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (SQLException e) {
+            System.out.println("\n>> Error al consultar el historial: " + e.getMessage());
         }
     }
 }
