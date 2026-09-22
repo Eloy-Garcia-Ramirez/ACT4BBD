@@ -12,7 +12,6 @@ public class SolicitudLicencia {
 
     // Constructor
     public SolicitudLicencia(int folio, String tipoLicencia, Ciudadano titular, Requisito requisito) {
-        this.folio = folio;
         this.tipoLicencia = tipoLicencia;
         this.titular = titular;
         this.requisito = requisito;
